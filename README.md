@@ -15,19 +15,26 @@
 
 ## 🚀 快速安装
 
-```bash
-# 克隆项目
+在飞书新建一个群组，将下面这一段内容复制后发送给飞书
+
+```
+请你按照下面步骤完成本群组的配置
+
+#  1.克隆项目
 git clone https://github.com/nieyi6/openclaw-content-factory.git
 cd openclaw-content-factory
 
-# 一键安装
+# 2.执行脚本
 chmod +x install.sh && ./install.sh
+
+# 3.绑定群组、Agent和workspace
+这是群组第一次发送消息，将群组和id=content的Agent 绑定，并且绑定workspace-content
 ```
 
 ## 📁 项目结构
 
 ```
-~/.openclaw/workspace/
+~/.openclaw/workspace-content/
 ├── AGENTS.md          # 核心规则：启动顺序、安全边界、通信风格
 ├── SOUL.md            # 角色定位：助手是谁、怎么做事
 ├── USER.md            # 用户档案：你的创作风格和偏好
@@ -40,34 +47,6 @@ chmod +x install.sh && ./install.sh
 ```
 
 ## 🔧 使用方式
-
-### 1. 初始化多维表格
-
-```
-帮我按照 TOOLS.md 里灵感库子表的字段定义，
-在我的飞书多维表格（App Token：[你的AppToken]）里新建一个名为「灵感库」的子表，
-包含所有字段和单选项的完整选项值。
-建完告诉我每个字段的名称和类型。
-```
-
-### 2. 验证配置
-
-```
-我刚刚给你发了一套配置文件，请现在按顺序读取以下文件并确认加载成功：
-AGENTS.md / SOUL.md / USER.md / TOOLS.md / SOP_CONTENT.md / HEARTBEAT.md / MEMORY.md
-
-读完之后告诉我：
-1. 你现在的角色是什么
-2. 你能操作哪些飞书功能
-3. 内容生产流程有几个阶段，分别叫什么
-```
-
-### 3. 开始使用
-
-- **存灵感**：发送链接给 AI，它会自动存入灵感库
-- **推荐选题**：发送「推荐选题」
-- **开始写作**：发送「写一篇关于XX的文章」
-- **定稿归档**：发送「定稿」
 
 ## 📊 工作流程
 
@@ -92,5 +71,3 @@ AGENTS.md / SOUL.md / USER.md / TOOLS.md / SOP_CONTENT.md / HEARTBEAT.md / MEMOR
 MIT
 
 ---
-
-*基于「饼干哥哥」的 AI 内容工厂 2.0 方案整理*

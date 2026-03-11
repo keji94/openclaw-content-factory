@@ -12,6 +12,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+OC_CFG="$OC_HOME/openclaw.json"
 
 # 打印函数
 print_info() {
@@ -30,8 +31,8 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# 检查 OpenClaw 工作目录
-WORKSPACE_DIR="$HOME/.openclaw/workspace"
+# 检查 OpenClaw 工作目录（使用专属 workspace-content，不影响主 workspace）
+WORKSPACE_DIR="$HOME/.openclaw/workspace-content"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo ""
@@ -51,7 +52,7 @@ if [ -d "$WORKSPACE_DIR" ]; then
     fi
     
     # 备份现有配置
-    BACKUP_DIR="$HOME/.openclaw/workspace_backup_$(date +%Y%m%d_%H%M%S)"
+    BACKUP_DIR="$HOME/.openclaw/$(basename "$WORKSPACE_DIR")_backup_$(date +%Y%m%d_%H%M%S)"
     print_info "备份现有配置到: $BACKUP_DIR"
     cp -r "$WORKSPACE_DIR" "$BACKUP_DIR"
 fi
@@ -93,6 +94,49 @@ chmod 644 "$WORKSPACE_DIR"/*.md
 TODAY=$(date +%Y-%m-%d)
 touch "$WORKSPACE_DIR/memory/$TODAY.md"
 
+
+# ── Step 2: 注册 Agents ─────────────────────────────────────
+register_agents() {
+  info "注册内容工厂Agent..."
+
+  # 备份配置
+  cp "$OC_CFG" "$OC_CFG.bak.content-$(date +%Y%m%d-%H%M%S)"
+  log "已备份配置: $OC_CFG.bak.*"
+
+  python3 << 'PYEOF'
+import json, pathlib, sys
+
+cfg_path = pathlib.Path.home() / '.openclaw' / 'openclaw.json'
+cfg = json.loads(cfg_path.read_text())
+
+AGENTS = [
+  {"id": "content"}
+]
+
+agents_cfg = cfg.setdefault('agents', {})
+agents_list = agents_cfg.get('list', [])
+existing_ids = {a['id'] for a in agents_list}
+
+added = 0
+for ag in AGENTS:
+    ag_id = ag['id']
+    ws = str(pathlib.Path.home() / f'.openclaw/workspace-{ag_id}')
+    if ag_id not in existing_ids:
+        entry = {'id': ag_id, 'workspace': ws, **{k:v for k,v in ag.items() if k!='id'}}
+        agents_list.append(entry)
+        added += 1
+        print(f'  + added: {ag_id}')
+    else:
+        print(f'  ~ exists: {ag_id} (skipped)')
+
+agents_cfg['list'] = agents_list
+cfg_path.write_text(json.dumps(cfg, ensure_ascii=False, indent=2))
+print(f'Done: {added} agents added')
+PYEOF
+
+  log "Agents 注册完成"
+}
+
 echo ""
 print_success "✅ 安装完成!"
 echo ""
@@ -133,18 +177,5 @@ echo "   3. 内容生产流程有几个阶段，分别叫什么"
 echo ""
 echo "═════════════════════════════════════════════════════════════"
 echo ""
-
-# 询问是否打开配置目录
-read -p "是否打开配置目录? (y/n): " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    if command -v open &> /dev/null; then
-        open "$WORKSPACE_DIR"
-    elif command -v xdg-open &> /dev/null; then
-        xdg-open "$WORKSPACE_DIR"
-    else
-        print_info "配置目录: $WORKSPACE_DIR"
-    fi
-fi
 
 print_success "🎉 开始使用你的 AI 内容工厂吧!"
