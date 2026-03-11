@@ -21,7 +21,7 @@
 请你按照下面步骤完成本群组的配置
 
 #  1.克隆项目
-git clone https://github.com/nieyi6/openclaw-content-factory.git
+git clone https://gitee.com/nieyiyi/openclaw-content-factory.git
 cd openclaw-content-factory
 
 # 2.执行脚本
@@ -63,8 +63,7 @@ chmod +x install.sh && ./install.sh
 ## 🔗 相关链接
 
 - [OpenClaw 官方文档](https://docs.openclaw.ai)
-- [ArkClaw 入口](https://v2ig.cn/cRm03IcFyUU/)
-- [原作者文章](https://mp.weixin.qq.com/s/aY3CDZ33ufjKfLwCiuYI-Q)
+- 关注我的公众号获取更多信息：**拾疑**
 
 ## 📝 License
 
