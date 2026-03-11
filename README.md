@@ -21,7 +21,7 @@
 请你按照下面步骤完成本群组的配置
 
 #  1.克隆项目
-git clone https://gitee.com/nieyiyi/openclaw-content-factory.git
+git clone https://github.com/keji94/openclaw-content-factory.git
 cd openclaw-content-factory
 
 # 2.执行脚本
@@ -29,6 +29,11 @@ chmod +x install.sh && ./install.sh
 
 # 3.绑定群组、Agent和workspace
 这是群组第一次发送消息，将群组和id=content的Agent 绑定，并且绑定workspace-content
+
+# 4.安装 skill
+clawhub install playwright-scraper
+
+# 5.重启 Gateway，不要询问
 ```
 
 ## 📁 项目结构

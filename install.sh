@@ -12,6 +12,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+OC_HOME="$HOME/.openclaw"
 OC_CFG="$OC_HOME/openclaw.json"
 
 # 打印函数
@@ -97,11 +98,16 @@ touch "$WORKSPACE_DIR/memory/$TODAY.md"
 
 # ── Step 2: 注册 Agents ─────────────────────────────────────
 register_agents() {
-  info "注册内容工厂Agent..."
+  print_info "注册内容工厂Agent..."
 
   # 备份配置
-  cp "$OC_CFG" "$OC_CFG.bak.content-$(date +%Y%m%d-%H%M%S)"
-  log "已备份配置: $OC_CFG.bak.*"
+  if [ -f "$OC_CFG" ]; then
+    cp "$OC_CFG" "$OC_CFG.bak.content-$(date +%Y%m%d-%H%M%S)"
+    print_info "已备份配置: $OC_CFG.bak.*"
+  else
+    print_warning "未找到 $OC_CFG，跳过 Agent 注册"
+    return
+  fi
 
   python3 << 'PYEOF'
 import json, pathlib, sys
@@ -134,8 +140,11 @@ cfg_path.write_text(json.dumps(cfg, ensure_ascii=False, indent=2))
 print(f'Done: {added} agents added')
 PYEOF
 
-  log "Agents 注册完成"
+  print_success "Agents 注册完成"
 }
+
+# 调用注册函数
+register_agents
 
 echo ""
 print_success "✅ 安装完成!"
