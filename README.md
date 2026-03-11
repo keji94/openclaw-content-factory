@@ -15,26 +15,38 @@
 
 ## 🚀 快速安装
 
-在飞书新建一个群组，将下面这一段内容复制后发送给飞书
+### 1.在飞书新建一个群组，将下面这一段内容复制后发送给飞书
 
 ```
 请你按照下面步骤完成本群组的配置
 
+# 1.主agent开启exec权限
+请你给主Agent /root/.openclaw/agents/main/agent/tools.json 修改以下配置，如果已经存在则忽略:
+    
+    {
+    "exec": { "allow": true },
+    "browser": { "allow": true },
+    "message": { "allow": true }
+    }
+
+
 #  1.克隆项目
-git clone https://github.com/keji94/openclaw-content-factory.git
+git clone https://gitee.com/nieyiyi/openclaw-content-factory.git
 cd openclaw-content-factory
 
-# 2.执行脚本
+# 2.安装claw-shell
+clawhub install claw-shell
+# 3.执行脚本
 chmod +x install.sh && ./install.sh
 
-# 3.绑定群组、Agent和workspace
+# 4.绑定群组、Agent和workspace
 这是群组第一次发送消息，将群组和id=content的Agent 绑定，并且绑定workspace-content
 
-# 4.安装 skill
+# 5.安装 skill
 clawhub install playwright-scraper
-
-# 5.重启 Gateway，不要询问
 ```
+### 2.重启 gateway
+在内容工厂群发送消息：请你重启 Gateway
 
 ## 📁 项目结构
 
@@ -64,6 +76,9 @@ clawhub install playwright-scraper
      ↓
 链接回填表格 → 人工改稿 → 告诉 AI 定稿 → 归档进知识库
 ```
+
+## 如何更新内容工厂的配置
+TODO
 
 ## 🔗 相关链接
 
