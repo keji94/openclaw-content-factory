@@ -37,7 +37,7 @@
 
 
 # 2.克隆项目
-git clone https://gitee.com/nieyiyi/openclaw-content-factory.git
+git clone https://github.com/keji94/openclaw-content-factory.git
 cd openclaw-content-factory
 # 3.执行脚本
 chmod +x install.sh && ./install.sh
