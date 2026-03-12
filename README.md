@@ -1,6 +1,6 @@
 # OpenClaw Content Factory 🏭
 
-> AI 内容工厂 .0 — 让飞书成为你的内容运转中心
+> AI 内容工厂 1.0 — 让飞书成为你的内容运转中心
 
 ## 🎯 这是什么？
 
@@ -15,11 +15,17 @@
 
 ## 🚀 快速安装
 
-### 1.在飞书新建一个群组，将下面这一段内容复制后发送给飞书
+### 1.在飞书新建一个群组--内容工厂。
+在群组发送一个消息:
+```
+@OpenClaw 你好
+```
+
+
+### 2.将下面这一段内容复制后发送给飞书**私聊机器人**
 
 ```
 请你按照下面步骤完成本群组的配置
-
 # 1.主agent开启exec权限
 请你给主Agent /root/.openclaw/agents/main/agent/tools.json 修改以下配置，如果已经存在则忽略:
     
@@ -33,15 +39,23 @@
 # 2.克隆项目
 git clone https://gitee.com/nieyiyi/openclaw-content-factory.git
 cd openclaw-content-factory
+# 3.执行脚本
+chmod +x install.sh && ./install.sh
+# 4.绑定群组、Agent和workspace
+刚刚给你新建了一个群组--内容工厂,并且发送了第一次问候，请你将群组和id=content的Agent绑定，并且绑定workspace-content
+{
+  "agentId": "content",
+  "match": {
+    "channel": "feishu",
+    "peer": { "kind": "group", "id": "{chatId}" } 
+}
+# 6.安装飞书官方插件,已安装则跳过
+执行 npx -y @larksuite/openclaw-lark-tools install
+# 7.按照TOOLS.md 初始化内容工厂多维表格
 
-# 3.安装skills,已安装则忽略
+# 8.给群组workspace-content安装skills,已安装则忽略
 clawhub install playwright-scraper
 
-# 4.执行脚本
-chmod +x install.sh && ./install.sh
-
-# 5.绑定群组、Agent和workspace
-这是群组第一次发送消息，将群组和id=content的Agent 绑定，并且绑定workspace-content
 ```
 ### 2.重启 gateway
 在内容工厂群发送消息：请你重启 Gateway
@@ -76,7 +90,10 @@ chmod +x install.sh && ./install.sh
 ```
 
 ## 如何更新内容工厂的配置
-TODO
+执行 update.sh
+
+## 如何卸载内容工厂
+执行 uninstall.sh
 
 ## 🔗 相关链接
 
