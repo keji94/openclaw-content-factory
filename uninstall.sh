@@ -134,18 +134,34 @@ except Exception as e:
 
 agents_cfg = cfg.get('agents', {})
 agents_list = agents_cfg.get('list', [])
+# bindings 是顶级字段，不在 agents 下面
+bindings_list = cfg.get('bindings', [])
 
-# 移除 content agent
+# 移除 content agent (from list)
 original_count = len(agents_list)
 agents_list = [a for a in agents_list if a.get('id') != 'content']
 removed_count = original_count - len(agents_list)
 
 if removed_count > 0:
     agents_cfg['list'] = agents_list
-    cfg_path.write_text(json.dumps(cfg, ensure_ascii=False, indent=2))
-    print(f'  ✓ 已移除 content agent')
+    print(f'  ✓ 已移除 content agent (list)')
 else:
-    print(f'  ~ content agent 不存在，无需移除')
+    print(f'  ~ content agent 不存在于 list，无需移除')
+
+# 移除 content agent 绑定的群组 (from bindings - 顶级字段)
+original_bindings_count = len(bindings_list)
+new_bindings = [b for b in bindings_list if b.get('agentId') != 'content']
+removed_bindings_count = original_bindings_count - len(new_bindings)
+
+if removed_bindings_count > 0:
+    cfg['bindings'] = new_bindings
+    print(f'  ✓ 已移除 {removed_bindings_count} 个群组绑定')
+else:
+    print(f'  ~ 无群组绑定需要移除')
+
+# 保存配置
+if removed_count > 0 or removed_bindings_count > 0:
+    cfg_path.write_text(json.dumps(cfg, ensure_ascii=False, indent=2))
 PYEOF
 
     print_success "Agent 注册已移除"
