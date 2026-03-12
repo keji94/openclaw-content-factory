@@ -76,7 +76,10 @@ chmod +x install.sh && ./install.sh
 ```
 
 ## 如何更新内容工厂的配置
-TODO
+执行 update.sh
+
+## 如何卸载内容工厂
+执行 uninstall.sh
 
 ## 🔗 相关链接
 
