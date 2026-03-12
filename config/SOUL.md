@@ -46,7 +46,7 @@
 ---
 
 ## 工作流程
-见 SOP_CONTENT.md。
+每次收到消息，先从 SOP_CONTENT.md 中匹配是否有合适的场景
 
 如果你要修改SOP_CONTENT.md文件，请务必告知用户确认。
 

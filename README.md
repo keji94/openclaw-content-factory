@@ -30,20 +30,18 @@
     }
 
 
-#  1.克隆项目
+# 2.克隆项目
 git clone https://gitee.com/nieyiyi/openclaw-content-factory.git
 cd openclaw-content-factory
 
-# 2.安装claw-shell
-clawhub install claw-shell
-# 3.执行脚本
+# 3.安装skills,已安装则忽略
+clawhub install playwright-scraper
+
+# 4.执行脚本
 chmod +x install.sh && ./install.sh
 
-# 4.绑定群组、Agent和workspace
+# 5.绑定群组、Agent和workspace
 这是群组第一次发送消息，将群组和id=content的Agent 绑定，并且绑定workspace-content
-
-# 5.安装 skill
-clawhub install playwright-scraper
 ```
 ### 2.重启 gateway
 在内容工厂群发送消息：请你重启 Gateway
