@@ -1,6 +1,41 @@
 # TOOLS.md
 Skills 定义了工具的工作方式。此文件用于记录你的具体信息——那些你的环境中独有的内容。
 
+---
+
+# 已安装 Skills 清单
+
+## 网页抓取
+
+| Skill | 路径 | 用途 |
+|-------|------|------|
+| playwright-scraper | `～/.openclaw/workspace/skills/playwright-scraper/` | 抓取动态页面、公众号文章（需 JS 渲染） |
+
+## 搜索与内容处理
+
+| Skill | 路径 | 用途 |
+|-------|------|------|
+| tavily-search | `～/.openclaw/workspace/skills/tavily-search/` | AI 优化的网页搜索 |
+
+## 内容创作辅助
+
+| Skill | 路径 | 用途 |
+|-------|------|------|
+| humanizer-zh | `～/.openclaw/workspace/skills/humanizer-zh/` | 中文文本人性化 |
+---
+
+# 常用技能速查
+
+## 网页内容抓取
+
+**静态页面** → `web_fetch` 工具（内置）
+**动态页面/公众号** → `playwright-scraper`
+```bash
+cd ～/.openclaw/workspace/skills/playwright-scraper && node scripts/playwright-stealth.js "<URL>"
+```
+
+---
+
 # 飞书工具
 
 ## 多维表格配置
