@@ -16,18 +16,7 @@
 }
 ```
 
-### Step 2: 克隆项目
-```bash
-git clone https://gitee.com/nieyiyi/openclaw-content-factory.git
-cd openclaw-content-factory
-```
-
-### Step 3: 执行安装脚本
-```bash
-chmod +x install.sh && ./install.sh
-```
-
-### Step 4: 绑定群组
+### Step 2: 绑定群组
 绑定当前群组到 agentId=content，workspace=workspace-content
 配置格式：
 ```json
@@ -40,7 +29,7 @@ chmod +x install.sh && ./install.sh
 }
 ```
 
-### Step 5: 安装飞书插件
+### Step 3: 安装飞书插件
 ```bash
 npx -y @larksuite/openclaw-lark-tools install
 ```
@@ -49,10 +38,10 @@ npx -y @larksuite/openclaw-lark-tools install
 /feishu auth
 ```
 
-### Step 6: 初始化多维表格
+### Step 4: 初始化多维表格
 按照 TOOLS.md 配置内容工厂表格（灵感库 + 内容写作两个子表）
 
-### Step 7: 安装 Skills
+### Step 5: 安装 Skills
 ```bash
 clawhub install playwright-scraper
 clawhub install tavily-search
