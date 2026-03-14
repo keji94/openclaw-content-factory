@@ -40,6 +40,20 @@ echo "║       🔄 OpenClaw Content Factory 配置更新程序           ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 
+# 拉取最新代码
+print_info "检查 git 仓库..."
+if [ -d "$SCRIPT_DIR/.git" ]; then
+    print_info "拉取最新配置..."
+    cd "$SCRIPT_DIR"
+    if git pull; then
+        print_success "代码已更新到最新版本"
+    else
+        print_warning "git pull 失败，将使用本地配置继续更新"
+    fi
+else
+    print_warning "当前目录不是 git 仓库，跳过 git pull"
+fi
+
 # 检查工作目录是否存在
 if [ ! -d "$WORKSPACE_DIR" ]; then
     print_error "未找到工作目录: $WORKSPACE_DIR"
@@ -215,10 +229,60 @@ echo "📁 配置文件位置: $WORKSPACE_DIR"
 echo ""
 echo "📝 memory 目录已保留，您的日记和记录不受影响"
 echo ""
-echo "🔄 如需在 AI 中应用新配置，请重新发送配置文件:"
+
+# 询问是否重启 Gateway
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "   我会发送更新后的配置文件，请按顺序加载："
-echo "   AGENTS.md / SOUL.md / USER.md / TOOLS.md / SOP_CONTENT.md / HEARTBEAT.md / MEMORY.md"
+read -p "🔄 是否立即重启 Gateway 使配置生效? (y/n): " -n 1 -r
 echo ""
+
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    print_info "正在重启 Gateway..."
+
+    # 执行重启命令
+    if openclaw gateway restart; then
+        print_success "Gateway 重启命令已执行"
+    else
+        print_error "Gateway 重启命令执行失败"
+        print_info "您可以稍后手动执行: openclaw gateway restart"
+        exit 1
+    fi
+
+    # 每5秒检查状态
+    print_info "正在检查 Gateway 状态..."
+    MAX_RETRIES=12  # 最多检查12次，共60秒
+    RETRY_COUNT=0
+
+    while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+        sleep 5
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+
+        if openclaw gateway status 2>/dev/null | grep -q "running\|active\|online"; then
+            print_success "✅ Gateway 已成功启动!"
+            echo ""
+            echo "═════════════════════════════════════════════════════════════"
+            echo ""
+            print_success "🎉 更新完成，Gateway 已重启!"
+            echo ""
+            exit 0
+        fi
+
+        print_info "等待 Gateway 启动... ($RETRY_COUNT/$MAX_RETRIES)"
+    done
+
+    print_warning "Gateway 状态检查超时，请手动确认状态: openclaw gateway status"
+    exit 0
+else
+    echo ""
+    print_info "您可以稍后手动重启 Gateway:"
+    echo ""
+    echo "   openclaw gateway restart"
+    echo ""
+    echo "然后使用以下命令检查状态:"
+    echo ""
+    echo "   openclaw gateway status"
+    echo ""
+fi
+
 echo "═════════════════════════════════════════════════════════════"
 echo ""
