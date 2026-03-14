@@ -55,7 +55,7 @@ npx -y @larksuite/openclaw-lark-tools install
 如果需要授权则等待用户完成授权，如果不需要授权则直接跳过
 
 ### Step 4: 初始化多维表格
-按照 TOOLS.md 配置内容工厂表格（灵感库 + 内容写作两个子表）
+按照 TOOLS.md 配置内容工厂表格（素材库 + 内容写作两个子表）
 
 ### Step 5: 安装 Skills
 ```bash

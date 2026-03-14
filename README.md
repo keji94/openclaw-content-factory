@@ -6,8 +6,8 @@
 
 一套 OpenClaw 配置文件模板，帮你快速搭建：
 
-- **灵感库**：刷到好内容，转给 AI 就自动存进去
-- **选题推荐**：AI 从灵感库推荐选题
+- **素材库**：刷到好内容，转给 AI 就自动存进去
+- **选题推荐**：AI 从素材库推荐选题
 - **内容写作**：选定选题，AI 自动创建大纲、初稿、云文档
 - **知识库归档**：定稿后自动归档到知识库
 
@@ -27,8 +27,10 @@
     git clone https://gitee.com/nieyiyi/openclaw-content-factory.git
     cd openclaw-content-factory
 ```
+完成后通知进度
 # 2.执行脚本
 chmod +x install.sh && ./install.sh
+完成后通知进度
 # 3.按照 openclaw-content-factory/config/BOOTSTRAP.md 进行初始化
 
 ```
@@ -56,9 +58,9 @@ chmod +x install.sh && ./install.sh
 ## 📊 工作流程
 
 ```
-刷到好内容 → 转给 AI → 存进灵感库 + 打标签 + 拆选题
+刷到好内容 → 转给 AI → 存进素材库 + 打标签 + 拆选题
      ↓
-想写东西时 → 问 AI 推荐 → AI 从灵感库给选题
+想写东西时 → 问 AI 推荐 → AI 从素材库给选题
      ↓
 选定选题 → AI 建档 → 出大纲 → 生成初稿 → 创建云文档
      ↓
