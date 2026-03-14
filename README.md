@@ -6,8 +6,8 @@
 
 一套 OpenClaw 配置文件模板，帮你快速搭建：
 
-- **灵感库**：刷到好内容，转给 AI 就自动存进去
-- **选题推荐**：AI 从灵感库推荐选题
+- **素材库**：刷到好内容，转给 AI 就自动存进去
+- **选题推荐**：AI 从素材库推荐选题
 - **内容写作**：选定选题，AI 自动创建大纲、初稿、云文档
 - **知识库归档**：定稿后自动归档到知识库
 
@@ -16,48 +16,26 @@
 ## 🚀 快速安装
 
 ### 1.在飞书新建一个群组--内容工厂。
-在群组发送一个消息:
-```
-@OpenClaw 你好
-```
-
-
-### 2.将下面这一段内容复制后发送给飞书**私聊机器人**
+在群里添加你的 OpenClaw 机器人
+### 2.将下面这一段内容复制后发送给内容工厂
 
 ```
+
 请你按照下面步骤完成本群组的配置
-# 1.主agent开启exec权限
-请你给主Agent /root/.openclaw/agents/main/agent/tools.json 修改以下配置，如果已经存在则忽略:
-    
-    {
-    "exec": { "allow": true },
-    "browser": { "allow": true },
-    "message": { "allow": true }
-    }
-
-
-# 2.克隆项目
-git clone https://github.com/keji94/openclaw-content-factory.git
-cd openclaw-content-factory
-# 3.执行脚本
+# 1.克隆项目
+```
+    git clone https://gitee.com/nieyiyi/openclaw-content-factory.git
+    cd openclaw-content-factory
+```
+完成后通知进度
+# 2.执行脚本
 chmod +x install.sh && ./install.sh
-# 4.绑定群组、Agent和workspace
-刚刚给你新建了一个群组--内容工厂,并且发送了第一次问候，请你将群组和id=content的Agent绑定，并且绑定workspace-content
-{
-  "agentId": "content",
-  "match": {
-    "channel": "feishu",
-    "peer": { "kind": "group", "id": "{chatId}" } 
-}
-# 6.安装飞书官方插件,已安装则跳过
-执行 npx -y @larksuite/openclaw-lark-tools install
-# 7.按照TOOLS.md 初始化内容工厂多维表格
-
-# 8.给群组workspace-content安装skills,已安装则忽略
-clawhub install playwright-scraper
+完成后通知进度
+# 3.按照 openclaw-content-factory/config/BOOTSTRAP.md 进行初始化
 
 ```
-### 2.重启 gateway
+
+### 3.重启 gateway
 在内容工厂群发送消息：请你重启 Gateway
 
 ## 📁 项目结构
@@ -80,9 +58,9 @@ clawhub install playwright-scraper
 ## 📊 工作流程
 
 ```
-刷到好内容 → 转给 AI → 存进灵感库 + 打标签 + 拆选题
+刷到好内容 → 转给 AI → 存进素材库 + 打标签 + 拆选题
      ↓
-想写东西时 → 问 AI 推荐 → AI 从灵感库给选题
+想写东西时 → 问 AI 推荐 → AI 从素材库给选题
      ↓
 选定选题 → AI 建档 → 出大纲 → 生成初稿 → 创建云文档
      ↓
