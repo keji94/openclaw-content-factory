@@ -68,6 +68,10 @@ fi
 if [ -d "$WORKSPACE_REPO_DIR" ]; then
     echo "  📦 工作区仓库: $WORKSPACE_REPO_DIR"
 fi
+AGENT_DIR="$HOME/.openclaw/agents/content"
+if [ -d "$AGENT_DIR" ]; then
+    echo "  📁 Agent 状态目录: $AGENT_DIR"
+fi
 echo ""
 
 # 选择卸载模式
@@ -195,6 +199,19 @@ remove_workspace() {
     fi
 }
 
+# ── 删除 Agent 状态目录 ─────────────────────────────────────
+remove_agent_dir() {
+    print_info "删除 Agent 状态目录..."
+
+    local AGENT_DIR="$HOME/.openclaw/agents/content"
+    if [ -d "$AGENT_DIR" ]; then
+        rm -rf "$AGENT_DIR"
+        print_success "Agent 状态目录已删除: $AGENT_DIR"
+    else
+        print_warning "Agent 状态目录不存在"
+    fi
+}
+
 # ── 删除 Git 仓库目录 ─────────────────────────────────────
 remove_repo() {
     print_info "删除 Git 仓库目录..."
@@ -259,12 +276,14 @@ cleanup_backups() {
 case $UNINSTALL_MODE in
     "full")
         unregister_agent
+        remove_agent_dir
         remove_workspace
         remove_repo
         cleanup_backups
         ;;
     "keep_memory")
         unregister_agent
+        remove_agent_dir
         remove_config_keep_memory
         ;;
     "unregister_only")

@@ -6,34 +6,25 @@
 
 ## 初始化步骤概览
 
-| 步骤     | 内容 | 预计耗时 | 依赖        | 阻塞点 |
-|--------|------|----------|-----------|--------|
-| Step 1 | 配置主 Agent 权限 | 10秒 | 无         | 无 |
-| Step 2 | 绑定群组 | 10秒 | 无         | 无 |
-| Step 3 | 安装 Skills | 30秒 | 无         | 无 |
-| Step 4 | 安装飞书插件 | 30-60秒 | 无         | 安装后需用户授权 |
-| Step 5 | 初始化多维表格 | 30秒 | Step 4 完成 | 需授权后才能执行 |
+| 步骤 | 内容 | 检查方式 | 手动安装可能已跳过 |
+|------|------|----------|-------------------|
+| Step 1 | 绑定群组 | 检查 bindings 是否已存在 content 绑定 | ✅ 可能已通过 FEISHU_CHAT_ID 配置 |
+| Step 2 | 安装飞书插件 | 检查插件是否已安装 | ✅ 可能已手动安装 |
+| Step 3 | 初始化多维表格 | 检查表格是否存在 | ❌ 需要执行 |
+| Step 4 | 验证 API Keys | 检查 .env 文件 | ✅ 可能已配置 |
 
+**执行原则**：每步先检查是否已完成，已完成的跳过。
 
-**执行顺序**：Step 1 → Step 2 → Step 3→ Step 4(等待授权) → Step 5
-**强制**：没完成一个初始化步骤，更新初始化进度记录表的状态字段
 ---
 
 ## 初始化步骤
 
-### Step 1: 配置主 Agent 权限
-修改 `~/.openclaw/agents/main/agent/tools.json`，添加：
-```json
-{
-  "exec": { "allow": true },
-  "browser": { "allow": true },
-  "message": { "allow": true }
-}
-```
+### Step 1: 检查并绑定群组
 
-### Step 2: 绑定群组
-绑定当前群组到 agentId=content，workspace=workspace-content
-配置格式：
+**检查**：读取 `~/.openclaw/openclaw.json`，检查 `bindings` 中是否已有 `agentId=content` 的绑定。
+
+**如果未绑定**：
+绑定当前群组到 agentId=content，配置格式：
 ```json
 {
   "agentId": "content",
@@ -44,97 +35,65 @@
 }
 ```
 
-### Step 3: 安装飞书插件
-```bash
-npx -y @larksuite/openclaw-lark-tools install
-```
-插件安装完成后，执行下面命令
-```
-/feishu auth
-```
-如果需要授权则等待用户完成授权，如果不需要授权则直接跳过
-
-### Step 4: 初始化多维表格
-按照 TOOLS.md 配置内容工厂表格（素材库 + 内容写作两个子表）
-
-### Step 5: 安装 Skills
-```bash
-clawhub install playwright-scraper
-clawhub install tavily-search
-clawhub install humanizer-zh
-```
-如果已安装则忽略
+**如果已绑定**：跳过，输出 `✅ Step 1: 群组已绑定`
 
 ---
 
-## 通知策略（强制执行）
+### Step 2: 检查飞书插件
 
-## 进度通知机制
-- schedule: "*/20 * * * * *"  # 每20秒（需要 cron 支持秒级）
-- action: 检查初始化状态，发送进度记录表的状态到内容工厂群组
+**检查**：执行 `/feishu auth` 测试是否已授权。
 
-
-### 进度记录表(每完成一个步骤时更新状态)
-
-| 进度     | 状态   |
-|--------|------|
-| Step 1 | 已完成  |
-| Step 2 | 已完成  |
-| Step 3 | 阻塞等待 |
-| Step 4 | 待执行  |
-| Step 4 | 待执行  |
-
-### 通知格式模板
-
+**如果未安装/未授权**：
+```bash
+npx -y @larksuite/openclaw-lark-tools install
 ```
-📍 初始化进度 [X/5]
+然后执行 `/feishu auth` 完成授权。
 
-✅ 已完成：
-- Step 1: XXXX
-- Step 2: XXXX
+**如果已授权**：跳过，输出 `✅ Step 2: 飞书插件已安装并授权`
 
-🔄 当前状态：
-- Step 4: ⏳ 等待用户授权 (/feishu auth)
+---
 
-⏸️ 阻塞中：
-- Step 5: 依赖 Step 4 完成
+### Step 3: 初始化多维表格
 
-⏳ 待执行：
-- Step 5: 初始化多维表格
-```
+**这是核心步骤，必须执行。**
 
-### 阻塞处理规范
+按照 TOOLS.md 配置内容工厂表格：
+- 创建素材库子表
+- 创建内容写作子表
+- 配置字段结构
 
-当步骤被阻塞时，通知必须包含：
-1. **阻塞原因** - 为什么无法进行
-2. **解除条件** - 什么条件满足后可以继续
-3. **用户操作** - 需要用户做什么
+---
 
-示例：
-```
-⏸️ Step 5 阻塞：飞书授权未完成
+### Step 4: 验证 API Keys
 
-原因：创建多维表格需要用户授权
-解除条件：完成 /feishu auth 授权
-需要你：请发送 "/feishu auth" 完成授权
-```
+**检查**：
+- `~/.openclaw/.env` 中的 `TAVILY_API_KEY`
+- `~/.openclaw/workspace-content/skills/yzfly-douyin-mcp-server-douyin-video/.env` 中的 `SILICONFLOW_API_KEY`
+
+**如果缺失**：提醒用户手动配置。
+
+**如果已配置**：输出 `✅ Step 4: API Keys 已配置`
 
 ---
 
 ## 完成标志
 
 当所有步骤执行完毕，发送：
+
 ```
 🎉 初始化完成！
 内容工厂已就绪，可以开始使用了。
 
 📊 最终状态：
-✅ Step 1: 主 Agent 权限已配置
-✅ Step 2: 群组已绑定 (oc_xxx)
-✅ Step 3: Skills 已安装 (3/3)
-✅ Step 4: 飞书插件已安装并授权
-✅ Step 5: 多维表格已创建
+✅ Step 1: 群组已绑定
+✅ Step 2: 飞书插件已授权
+✅ Step 3: 多维表格已创建
+✅ Step 4: API Keys 已配置
 
+📝 接下来你可以：
+- 发送链接，自动入库素材
+- 说「推荐选题」，获取选题建议
+- 说「选X」，开始写作流程
 ```
 
 然后删除此 BOOTSTRAP.md 文件。
