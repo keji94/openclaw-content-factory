@@ -171,7 +171,13 @@ PYEOF
 remove_workspace() {
     print_info "删除工作空间..."
 
-    if [ -d "$WORKSPACE_DIR" ]; then
+    if [ -L "$WORKSPACE_DIR" ]; then
+        local target
+        target="$(readlink -f "$WORKSPACE_DIR")"
+        rm "$WORKSPACE_DIR"
+        print_success "已移除符号链接: $WORKSPACE_DIR -> $target"
+    elif [ -d "$WORKSPACE_DIR" ]; then
+        print_warning "工作空间是普通目录（非符号链接），谨慎删除"
         rm -rf "$WORKSPACE_DIR"
         print_success "工作空间已删除: $WORKSPACE_DIR"
     else
@@ -209,24 +215,29 @@ remove_external_tools() {
 remove_workspace_keep_memory() {
     print_info "删除工作空间（保留 memory 目录）..."
 
-    if [ ! -d "$WORKSPACE_DIR" ]; then
+    if [ -L "$WORKSPACE_DIR" ]; then
+        # 符号链接模式：memory 在 git 项目里，无需额外处理，只移除链接
+        local target
+        target="$(readlink -f "$WORKSPACE_DIR")"
+        print_info "memory 目录保留在: $target/memory/"
+        rm "$WORKSPACE_DIR"
+        print_success "已移除符号链接，memory 目录保留在原项目中"
+    elif [ -d "$WORKSPACE_DIR" ]; then
+        # 普通目录模式：需要备份 memory
+        local MEMORY_BACKUP="$OC_HOME/memory_backup_$(date +%Y%m%d_%H%M%S)"
+        if [ -d "$WORKSPACE_DIR/memory" ]; then
+            cp -r "$WORKSPACE_DIR/memory" "$MEMORY_BACKUP"
+        fi
+
+        rm -rf "$WORKSPACE_DIR"
+
+        if [ -d "$MEMORY_BACKUP" ]; then
+            mkdir -p "$WORKSPACE_DIR"
+            mv "$MEMORY_BACKUP" "$WORKSPACE_DIR/memory"
+            print_success "工作空间已删除，memory 目录已保留"
+        fi
+    else
         print_warning "工作空间不存在"
-        return
-    fi
-
-    # 临时保存 memory 目录
-    local MEMORY_BACKUP="$OC_HOME/memory_backup_$(date +%Y%m%d_%H%M%S)"
-    if [ -d "$WORKSPACE_DIR/memory" ]; then
-        cp -r "$WORKSPACE_DIR/memory" "$MEMORY_BACKUP"
-    fi
-
-    rm -rf "$WORKSPACE_DIR"
-
-    # 将 memory 移回
-    if [ -d "$MEMORY_BACKUP" ]; then
-        mkdir -p "$WORKSPACE_DIR"
-        mv "$MEMORY_BACKUP" "$WORKSPACE_DIR/memory"
-        print_success "工作空间已删除，memory 目录已保留"
     fi
 }
 

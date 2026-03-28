@@ -52,61 +52,37 @@ echo "║       OpenClaw Content Factory 安装程序                 ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 
-# ── Step 1: 复制项目到工作空间 ─────────────────────────────────────
+# ── Step 1: 创建符号链接指向 git 项目 ─────────────────────────────────────
 install_workspace() {
   print_info "安装工作空间..."
 
-  # 如果已存在，提示备份
-  if [ -d "$WORKSPACE_DIR" ]; then
+  # 如果已存在，提示处理
+  if [ -e "$WORKSPACE_DIR" ] || [ -L "$WORKSPACE_DIR" ]; then
+    # 检查是否已经是指向当前项目的符号链接
+    if [ -L "$WORKSPACE_DIR" ]; then
+      local current_target
+      current_target="$(readlink -f "$WORKSPACE_DIR")"
+      if [ "$current_target" = "$SCRIPT_DIR" ]; then
+        print_success "工作空间已是当前项目的符号链接，跳过"
+        return
+      fi
+    fi
     print_warning "检测到已存在工作空间: $WORKSPACE_DIR"
-    read -p "是否备份现有工作空间并继续? (y/n): " -n 1 -r
+    read -p "是否移除并重新链接? (y/n): " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         print_info "安装已取消"
         exit 0
     fi
-
-    BACKUP_DIR="$OC_HOME/${WORKSPACE_NAME}_backup_$(date +%Y%m%d_%H%M%S)"
-    print_info "备份现有工作空间到: $BACKUP_DIR"
-    mv "$WORKSPACE_DIR" "$BACKUP_DIR"
+    rm -rf "$WORKSPACE_DIR"
   fi
 
   # 创建目标目录
   mkdir -p "$OC_HOME"
 
-  # 复制项目文件（排除 .git、.idea 等开发文件）
-  print_info "复制项目文件到 $WORKSPACE_DIR ..."
-  EXCLUDE_DIRS=(.git .idea .vscode .claude node_modules .DS_Store Thumbs.db)
-  EXCLUDE_FILES=(.env .env.example)
-
-  if command -v rsync &> /dev/null; then
-    rsync -a \
-      --exclude='.git' \
-      --exclude='.idea' \
-      --exclude='.vscode' \
-      --exclude='.claude' \
-      --exclude='node_modules' \
-      --exclude='.env' \
-      --exclude='.DS_Store' \
-      --exclude='Thumbs.db' \
-      --exclude='.env.example' \
-      "$SCRIPT_DIR/" "$WORKSPACE_DIR/"
-  else
-    print_warning "  rsync 不可用，使用 cp 回退方案"
-    mkdir -p "$WORKSPACE_DIR"
-    # 使用 tar 排除不需要的文件
-    tar cf - \
-      --exclude='.git' \
-      --exclude='.idea' \
-      --exclude='.vscode' \
-      --exclude='.claude' \
-      --exclude='node_modules' \
-      --exclude='.env' \
-      --exclude='.DS_Store' \
-      --exclude='Thumbs.db' \
-      --exclude='.env.example' \
-      -C "$SCRIPT_DIR" . | tar xf - -C "$WORKSPACE_DIR"
-  fi
+  # 创建符号链接指向当前 git 项目
+  ln -s "$SCRIPT_DIR" "$WORKSPACE_DIR"
+  print_info "符号链接: $WORKSPACE_DIR -> $SCRIPT_DIR"
 
   # 确保 memory 目录存在
   mkdir -p "$WORKSPACE_DIR/memory"
@@ -115,7 +91,12 @@ install_workspace() {
   TODAY=$(date +%Y-%m-%d)
   touch "$WORKSPACE_DIR/memory/$TODAY.md"
 
-  print_success "工作空间安装完成"
+  # 确保 .gitignore 包含 memory/
+  if [ -f "$WORKSPACE_DIR/.gitignore" ]; then
+    grep -qxF 'memory/' "$WORKSPACE_DIR/.gitignore" 2>/dev/null || echo 'memory/' >> "$WORKSPACE_DIR/.gitignore"
+  fi
+
+  print_success "工作空间安装完成（符号链接模式，修改即 git 可见）"
 }
 
 install_workspace

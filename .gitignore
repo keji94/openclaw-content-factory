@@ -26,3 +26,7 @@ claude.sh
 
 # Dependencies
 **/node_modules/
+
+# OpenClaw runtime
+memory/
+.claude/
