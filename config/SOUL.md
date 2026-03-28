@@ -46,7 +46,7 @@
 ---
 
 ## 工作流程
-每次收到消息，先从 SOP_CONTENT.md 中匹配是否有合适的场景
+每次收到消息，先从 SOP_CONTENT.md 的场景匹配索引中找到对应场景，然后仅读取对应的 SOP_SCENE_x_xxx.md 文件执行
 
 如果你要修改SOP_CONTENT.md文件，请务必告知用户确认。
 

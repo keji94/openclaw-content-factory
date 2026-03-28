@@ -62,7 +62,7 @@ if [ ! -d "$WORKSPACE_DIR" ]; then
 fi
 
 # 必需的配置文件
-REQUIRED_FILES=("AGENTS.md" "SOUL.md" "USER.md" "TOOLS.md" "SOP_CONTENT.md" "HEARTBEAT.md" "MEMORY.md")
+REQUIRED_FILES=("AGENTS.md" "SOUL.md" "USER.md" "TOOLS.md" "SOP_CONTENT.md" "HEARTBEAT.md" "MEMORY.md" "SOP_SCENE_1_素材入库.md" "SOP_SCENE_2_选题推荐.md" "SOP_SCENE_3_大纲生成.md" "SOP_SCENE_4_初稿写作.md" "SOP_SCENE_5_智能审稿.md" "SOP_SCENE_6_润色打磨.md" "SOP_SCENE_7_定稿归档.md" "SOP_SCENE_7.5_发布公众号.md" "SOP_SCENE_8_归档发布.md")
 
 # 检查源配置文件是否存在
 print_info "检查源配置文件..."

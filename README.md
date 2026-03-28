@@ -147,7 +147,8 @@ chmod +x install.sh && ./install.sh
 │   ├── SOUL.md                      # 角色定位
 │   ├── USER.md                      # 用户档案
 │   ├── TOOLS.md                     # 工具配置
-│   ├── SOP_CONTENT.md               # 内容生产 SOP
+│   ├── SOP_CONTENT.md               # 内容生产 SOP 索引
+│   ├── SOP_SCENE_*.md               # 各场景详细步骤
 │   ├── HEARTBEAT.md                 # 定时任务
 │   ├── MEMORY.md                    # 长期记忆
 │   ├── BOOTSTRAP.md                 # 初始化指南

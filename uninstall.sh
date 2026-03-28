@@ -175,7 +175,7 @@ PYEOF
 remove_config_files() {
     print_info "删除配置文件..."
 
-    REQUIRED_FILES=("AGENTS.md" "SOUL.md" "USER.md" "TOOLS.md" "SOP_CONTENT.md" "HEARTBEAT.md" "MEMORY.md")
+    REQUIRED_FILES=("AGENTS.md" "SOUL.md" "USER.md" "TOOLS.md" "SOP_CONTENT.md" "HEARTBEAT.md" "MEMORY.md" "SOP_SCENE_1_素材入库.md" "SOP_SCENE_2_选题推荐.md" "SOP_SCENE_3_大纲生成.md" "SOP_SCENE_4_初稿写作.md" "SOP_SCENE_5_智能审稿.md" "SOP_SCENE_6_润色打磨.md" "SOP_SCENE_7_定稿归档.md" "SOP_SCENE_7.5_发布公众号.md" "SOP_SCENE_8_归档发布.md")
 
     for file in "${REQUIRED_FILES[@]}"; do
         if [ -f "$WORKSPACE_DIR/$file" ]; then
@@ -247,7 +247,7 @@ remove_repo() {
 remove_config_keep_memory() {
     print_info "删除配置文件（保留 memory 目录）..."
 
-    REQUIRED_FILES=("AGENTS.md" "SOUL.md" "USER.md" "TOOLS.md" "SOP_CONTENT.md" "HEARTBEAT.md" "MEMORY.md")
+    REQUIRED_FILES=("AGENTS.md" "SOUL.md" "USER.md" "TOOLS.md" "SOP_CONTENT.md" "HEARTBEAT.md" "MEMORY.md" "SOP_SCENE_1_素材入库.md" "SOP_SCENE_2_选题推荐.md" "SOP_SCENE_3_大纲生成.md" "SOP_SCENE_4_初稿写作.md" "SOP_SCENE_5_智能审稿.md" "SOP_SCENE_6_润色打磨.md" "SOP_SCENE_7_定稿归档.md" "SOP_SCENE_7.5_发布公众号.md" "SOP_SCENE_8_归档发布.md")
 
     for file in "${REQUIRED_FILES[@]}"; do
         if [ -f "$WORKSPACE_DIR/$file" ]; then
