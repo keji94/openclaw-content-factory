@@ -21,7 +21,7 @@ Thumbs.db
 
 # Env
 .env
-config/skills/*/.env
+skills/*/.env
 claude.sh
 
 # Dependencies
