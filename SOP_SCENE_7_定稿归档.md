@@ -14,7 +14,19 @@
 {"状态": "已写作"}
 ```
 
-**Step 2: 询问发布**
+**Step 2: 保存定稿快照并触发学习**
+
+1. 从飞书云文档获取最新内容（Markdown 格式）
+2. 保存定稿并自动触发差异分析：
+```bash
+python scripts/observe_final.py \
+    --article-id "YYYY-MM-DD_标题关键词" \
+    --content "定稿MD内容"
+```
+> article-id 必须与 Scene 5 保存初稿时一致（根据文章标题重建）
+> observe_final.py 会自动链式调用：analyze_diff.py → extract_rules.py → 更新 rules.json
+
+**Step 3: 询问发布**
 ```
 ✅ 已标记为定稿！
 

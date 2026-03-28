@@ -62,7 +62,19 @@
 }
 ```
 
-**Step 5: 反馈用户**
+**Step 5: 保存初稿快照（写作学习）**
+
+保存初稿用于后续对比学习：
+```bash
+python scripts/observe_draft.py \
+    --article-id "YYYY-MM-DD_标题关键词" \
+    --title "文章标题" \
+    --source "云文档URL" \
+    --content "初稿MD内容"
+```
+> article-id 格式：日期_标题关键词（如 `2026-03-28_AI工具推荐`），Scene 7 定稿时需用同一 ID
+
+**Step 6: 反馈用户**
 ```
 ✅ 初稿已完成！
 

@@ -101,6 +101,22 @@ install_workspace() {
 
 install_workspace
 
+# ── Step 1.5: 初始化写作改进系统目录 ─────────────────────────────
+init_writing_improvement() {
+  print_info "初始化写作改进系统目录..."
+
+  local WI_DIR="$WORKSPACE_DIR/writing-improvement"
+  mkdir -p "$WI_DIR/drafts" "$WI_DIR/finals" "$WI_DIR/diffs"
+
+  # 确保 .gitignore 包含 writing-improvement/
+  if [ -f "$WORKSPACE_DIR/.gitignore" ]; then
+    grep -qxF 'writing-improvement/' "$WORKSPACE_DIR/.gitignore" 2>/dev/null || echo 'writing-improvement/' >> "$WORKSPACE_DIR/.gitignore"
+  fi
+
+  print_success "写作改进目录已创建"
+}
+init_writing_improvement
+
 # ── Step 2: 注册 Agent & 绑定群组 ─────────────────────────────────────
 register_agent() {
   print_info "注册 Agent 到 openclaw.json ..."

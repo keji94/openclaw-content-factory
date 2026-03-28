@@ -22,11 +22,16 @@ Thumbs.db
 # Env
 .env
 skills/*/.env
+skills/playwright-scraper-skill/*.png
+skills/playwright-scraper-skill/*.html
 claude.sh
 
 # Dependencies
 **/node_modules/
 
+BOOTSTRAP.md
+
 # OpenClaw runtime
 memory/
 .claude/
+writing-improvement/

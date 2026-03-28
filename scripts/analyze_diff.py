@@ -19,7 +19,7 @@ from typing import List, Dict, Tuple
 def load_config():
     """加载配置"""
     config_dir = Path(__file__).parent.parent / "writing-rules"
-    workspace_dir = Path(__file__).parent.parent.parent / "workspace-content" / "writing-improvement"
+    workspace_dir = Path(__file__).parent.parent / "writing-improvement"
 
     return {
         "config_dir": config_dir,
