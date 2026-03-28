@@ -33,9 +33,8 @@ print_error() {
 }
 
 # 工作目录
-WORKSPACE_DIR="$HOME/.openclaw/workspace-content"
-REPO_DIR="$HOME/.openclaw/openclaw-content-factory"
-WORKSPACE_REPO_DIR="$HOME/.openclaw/workspace/openclaw-content-factory"
+WORKSPACE_DIR="$HOME/.openclaw/workspace-openclaw-content-factory"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
@@ -62,11 +61,8 @@ fi
 if [ -f "$OC_CFG" ]; then
     echo "  📄 Agent 注册: content (将从 openclaw.json 移除)"
 fi
-if [ -d "$REPO_DIR" ]; then
-    echo "  📦 Git 仓库: $REPO_DIR"
-fi
-if [ -d "$WORKSPACE_REPO_DIR" ]; then
-    echo "  📦 工作区仓库: $WORKSPACE_REPO_DIR"
+if [ -d "$SCRIPT_DIR/.git" ]; then
+    echo "  📦 项目源目录: $SCRIPT_DIR"
 fi
 AGENT_DIR="$HOME/.openclaw/agents/content"
 if [ -d "$AGENT_DIR" ]; then
@@ -171,31 +167,15 @@ PYEOF
     print_success "Agent 注册已移除"
 }
 
-# ── 删除配置文件 ─────────────────────────────────────
-remove_config_files() {
-    print_info "删除配置文件..."
-
-    REQUIRED_FILES=("AGENTS.md" "SOUL.md" "USER.md" "TOOLS.md" "SOP_CONTENT.md" "HEARTBEAT.md" "MEMORY.md" "SOP_SCENE_1_素材入库.md" "SOP_SCENE_2_选题推荐.md" "SOP_SCENE_3_大纲生成.md" "SOP_SCENE_4_初稿写作.md" "SOP_SCENE_5_智能审稿.md" "SOP_SCENE_6_润色打磨.md" "SOP_SCENE_7_定稿归档.md" "SOP_SCENE_7.5_发布公众号.md" "SOP_SCENE_8_归档发布.md")
-
-    for file in "${REQUIRED_FILES[@]}"; do
-        if [ -f "$WORKSPACE_DIR/$file" ]; then
-            rm "$WORKSPACE_DIR/$file"
-            print_info "  已删除: $file"
-        fi
-    done
-
-    print_success "配置文件已删除"
-}
-
-# ── 删除整个工作目录 ─────────────────────────────────────
+# ── 删除工作空间 ─────────────────────────────────────
 remove_workspace() {
-    print_info "删除工作目录..."
+    print_info "删除工作空间..."
 
     if [ -d "$WORKSPACE_DIR" ]; then
         rm -rf "$WORKSPACE_DIR"
-        print_success "工作目录已删除: $WORKSPACE_DIR"
+        print_success "工作空间已删除: $WORKSPACE_DIR"
     else
-        print_warning "工作目录不存在"
+        print_warning "工作空间不存在"
     fi
 }
 
@@ -224,41 +204,29 @@ remove_external_tools() {
     fi
 }
 
-# ── 删除 Git 仓库目录 ─────────────────────────────────────
-remove_repo() {
-    print_info "删除 Git 仓库目录..."
 
-    if [ -d "$REPO_DIR" ]; then
-        rm -rf "$REPO_DIR"
-        print_success "Git 仓库目录已删除: $REPO_DIR"
-    else
-        print_warning "Git 仓库目录不存在: $REPO_DIR"
+# ── 删除工作空间（保留 memory）─────────────────────────────────────
+remove_workspace_keep_memory() {
+    print_info "删除工作空间（保留 memory 目录）..."
+
+    if [ ! -d "$WORKSPACE_DIR" ]; then
+        print_warning "工作空间不存在"
+        return
     fi
 
-    if [ -d "$WORKSPACE_REPO_DIR" ]; then
-        rm -rf "$WORKSPACE_REPO_DIR"
-        print_success "工作区仓库目录已删除: $WORKSPACE_REPO_DIR"
-    else
-        print_warning "工作区仓库目录不存在: $WORKSPACE_REPO_DIR"
-    fi
-}
-
-# ── 仅删除配置文件，保留 memory ─────────────────────────────────────
-remove_config_keep_memory() {
-    print_info "删除配置文件（保留 memory 目录）..."
-
-    REQUIRED_FILES=("AGENTS.md" "SOUL.md" "USER.md" "TOOLS.md" "SOP_CONTENT.md" "HEARTBEAT.md" "MEMORY.md" "SOP_SCENE_1_素材入库.md" "SOP_SCENE_2_选题推荐.md" "SOP_SCENE_3_大纲生成.md" "SOP_SCENE_4_初稿写作.md" "SOP_SCENE_5_智能审稿.md" "SOP_SCENE_6_润色打磨.md" "SOP_SCENE_7_定稿归档.md" "SOP_SCENE_7.5_发布公众号.md" "SOP_SCENE_8_归档发布.md")
-
-    for file in "${REQUIRED_FILES[@]}"; do
-        if [ -f "$WORKSPACE_DIR/$file" ]; then
-            rm "$WORKSPACE_DIR/$file"
-            print_info "  已删除: $file"
-        fi
-    done
-
-    # 检查 memory 目录是否保留
+    # 临时保存 memory 目录
+    local MEMORY_BACKUP="$OC_HOME/memory_backup_$(date +%Y%m%d_%H%M%S)"
     if [ -d "$WORKSPACE_DIR/memory" ]; then
-        print_success "配置文件已删除，memory 目录已保留"
+        cp -r "$WORKSPACE_DIR/memory" "$MEMORY_BACKUP"
+    fi
+
+    rm -rf "$WORKSPACE_DIR"
+
+    # 将 memory 移回
+    if [ -d "$MEMORY_BACKUP" ]; then
+        mkdir -p "$WORKSPACE_DIR"
+        mv "$MEMORY_BACKUP" "$WORKSPACE_DIR/memory"
+        print_success "工作空间已删除，memory 目录已保留"
     fi
 }
 
@@ -266,19 +234,19 @@ remove_config_keep_memory() {
 cleanup_backups() {
     print_info "检查备份文件..."
 
-    BACKUP_COUNT=$(find "$OC_HOME" -maxdepth 1 -name "workspace-content_backup_*" -type d 2>/dev/null | wc -l | tr -d ' ')
+    BACKUP_COUNT=$(find "$OC_HOME" -maxdepth 1 -name "workspace-openclaw-content-factory_backup_*" -type d 2>/dev/null | wc -l | tr -d ' ')
 
     if [ "$BACKUP_COUNT" -gt 0 ]; then
         echo ""
         echo "发现 $BACKUP_COUNT 个备份目录:"
-        find "$OC_HOME" -maxdepth 1 -name "workspace-content_backup_*" -type d 2>/dev/null | while read dir; do
+        find "$OC_HOME" -maxdepth 1 -name "workspace-openclaw-content-factory_backup_*" -type d 2>/dev/null | while read dir; do
             echo "  - $(basename "$dir")"
         done
         echo ""
         read -p "是否同时删除这些备份? (y/n): " -n 1 -r
         echo ""
         if [[ $REPLY =~ ^[Yy]$ ]]; then
-            find "$OC_HOME" -maxdepth 1 -name "workspace-content_backup_*" -type d -exec rm -rf {} \;
+            find "$OC_HOME" -maxdepth 1 -name "workspace-openclaw-content-factory_backup_*" -type d -exec rm -rf {} \;
             print_success "备份文件已清理"
         fi
     fi
@@ -291,13 +259,12 @@ case $UNINSTALL_MODE in
         remove_agent_dir
         remove_external_tools
         remove_workspace
-        remove_repo
         cleanup_backups
         ;;
     "keep_memory")
         unregister_agent
         remove_agent_dir
-        remove_config_keep_memory
+        remove_workspace_keep_memory
         ;;
     "unregister_only")
         unregister_agent
