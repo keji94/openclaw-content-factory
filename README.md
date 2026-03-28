@@ -76,18 +76,23 @@ npx -y @larksuite/openclaw-lark-tools install
 git clone https://gitee.com/nieyiyi/openclaw-content-factory.git
 cd openclaw-content-factory
 
-# 配置环境变量并执行安装
-TAVILY_API_KEY=<第三步获取的key> SILICONFLOW_API_KEY=<第三步获取的key> FEISHU_CHAT_ID=<第三步获取的chatId> ./install.sh
+# 复制配置文件模板（可选）
+cp .env.example .env
+
+# 编辑 .env 文件，填入你的配置（可选，也可以安装后配置）
+# vim .env
+
+# 执行安装
+./install.sh
 ```
 
-**环境变量说明**：
+**配置说明**：
 
-| 环境变量 | 必需 | 说明 |
+| 配置项 | 必需 | 说明 |
 |---------|------|------|
+| `FEISHU_CHAT_ID` | 可选 | 飞书群组 ID，格式如 `oc_xxx` |
 | `TAVILY_API_KEY` | 可选 | Tavily 搜索 |
 | `SILICONFLOW_API_KEY` | 可选 | 硅基流动 API |
-| `FEISHU_CHAT_ID` | 可选 | 飞书群组 ID，格式如 `oc_xxx` |
-
 #### Step 5: 初始化配置
 
 在飞书群组中发送以下消息，让 AI 完成初始化：

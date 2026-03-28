@@ -32,9 +32,20 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# 获取脚本目录
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# 读取配置文件（如果存在）
+if [ -f "$SCRIPT_DIR/.env" ]; then
+  print_info "读取配置文件: $SCRIPT_DIR/.env"
+  # 导出 .env 中的变量
+  set -a
+  source "$SCRIPT_DIR/.env"
+  set +a
+fi
+
 # 检查 OpenClaw 工作目录（使用专属 workspace-content，不影响主 workspace）
 WORKSPACE_DIR="$HOME/.openclaw/workspace-content"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
@@ -251,6 +262,101 @@ install_local_skills() {
 # 调用安装函数
 install_local_skills
 
+# ── Step 4.5: 安装外部 CLI 工具 ─────────────────────────────────
+install_external_tools() {
+  print_info "检查外部 CLI 工具..."
+
+  # 确保 ~/bin 存在
+  mkdir -p "$HOME/bin"
+
+  # 检查并安装 md2wechat CLI
+  install_md2wechat
+}
+
+# 安装 md2wechat CLI
+install_md2wechat() {
+  # 1. 检查是否已在 PATH 中
+  if command -v md2wechat &> /dev/null; then
+    local version=$(md2wechat version 2>/dev/null || echo "unknown")
+    print_success "  ✓ md2wechat CLI 已安装 (version: $version)"
+    return 0
+  fi
+
+  # 2. 检查 ~/bin/md2wechat 是否存在
+  if [ -x "$HOME/bin/md2wechat" ]; then
+    print_success "  ✓ md2wechat CLI 已安装在 ~/bin"
+    print_info "    提示: 将 'export PATH=\"\$HOME/bin:\$PATH\"' 添加到 ~/.zshrc"
+    return 0
+  fi
+
+  # 3. 需要安装
+  print_info "  md2wechat CLI 未安装，尝试自动安装..."
+
+  # 检查 Go
+  if ! command -v go &> /dev/null; then
+    print_warning "  未检测到 Go，跳过 md2wechat 自动安装"
+    print_info "    请手动安装:"
+    print_info "      1. 安装 Go: brew install go"
+    print_info "      2. 重新运行此安装脚本"
+    return 1
+  fi
+
+  # Go 版本检查
+  local go_version=$(go version 2>/dev/null | awk '{print $3}' | sed 's/go//')
+  print_info "  检测到 Go $go_version"
+
+  # 创建临时目录用于编译
+  local tmp_dir=$(mktemp -d)
+  local repo_dir="$tmp_dir/md2wechat-skill"
+
+  print_info "  克隆 md2wechat-skill 项目..."
+  if ! git clone --depth 1 https://github.com/geekjourneyx/md2wechat-skill.git "$repo_dir" 2>/dev/null; then
+    print_warning "  克隆失败，尝试使用 Gitee 镜像..."
+    if ! git clone --depth 1 https://gitee.com/nieyiyi/md2wechat-skill.git "$repo_dir" 2>/dev/null; then
+      print_error "  克隆失败，请检查网络连接"
+      rm -rf "$tmp_dir"
+      return 1
+    fi
+  fi
+
+  print_info "  编译 md2wechat CLI (使用国内代理)..."
+  cd "$repo_dir"
+
+  # 设置 Go 代理并编译
+  if GOPROXY=https://goproxy.cn,direct go build -o md2wechat ./cmd/md2wechat 2>&1; then
+    # 安装到 ~/bin
+    mv md2wechat "$HOME/bin/"
+    chmod +x "$HOME/bin/md2wechat"
+
+    print_success "  ✓ md2wechat CLI 安装成功"
+
+    # 添加到 PATH（当前会话）
+    export PATH="$HOME/bin:$PATH"
+
+    # 提示永久添加到 PATH
+    if ! grep -q 'export PATH="\$HOME/bin:\$PATH"' ~/.zshrc 2>/dev/null; then
+      print_info "  将 ~/bin 添加到 PATH..."
+      echo '' >> ~/.zshrc
+      echo '# Added by openclaw-content-factory' >> ~/.zshrc
+      echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
+    fi
+
+    print_info "  请运行 'source ~/.zshrc' 或重新打开终端使 PATH 生效"
+  else
+    print_error "  编译失败"
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+
+  # 清理
+  cd - > /dev/null
+  rm -rf "$tmp_dir"
+  return 0
+}
+
+# 调用安装函数
+install_external_tools
+
 # ── Step 5: 配置 API Keys ─────────────────────────────────
 configure_api_keys() {
   print_info "配置 API Keys..."
@@ -261,9 +367,12 @@ configure_api_keys() {
 
   # 定义需要的 API Keys（名称:描述:存放位置）
   # 存放位置: "global" = ~/.openclaw/.env, "skill:目录名" = skills/目录名/.env
+  # 多个 skill 共用同一个 key 用逗号分隔
   local API_KEY_CONFIGS=(
     "TAVILY_API_KEY:Tavily 搜索:global"
-    "SILICONFLOW_API_KEY:硅基流动 API:skill:yzfly-douyin-mcp-server-douyin-video"
+    "SILICONFLOW_API_KEY:硅基流动 API:skill:yzfly-douyin-mcp-server-douyin-video,ai-cover-generator"
+    "WECHAT_APPID:微信公众号 AppID:skill:md2wechat"
+    "WECHAT_SECRET:微信公众号 Secret:skill:md2wechat"
   )
 
   local has_keys=0
@@ -286,11 +395,14 @@ configure_api_keys() {
         write_env_key "$ENV_FILE" "$key_name" "$key_value"
         print_info "    → $ENV_FILE"
       else
-        # 写入 skill 目录下的 .env
-        skill_name="${key_location#skill:}"
-        skill_env_file="$SKILLS_DIR/$skill_name/.env"
-        write_env_key "$skill_env_file" "$key_name" "$key_value"
-        print_info "    → $skill_env_file"
+        # 写入 skill 目录下的 .env（支持多个 skill，用逗号分隔）
+        skill_names="${key_location#skill:}"
+        IFS=',' read -ra skill_array <<< "$skill_names"
+        for skill_name in "${skill_array[@]}"; do
+          skill_env_file="$SKILLS_DIR/$skill_name/.env"
+          write_env_key "$skill_env_file" "$key_name" "$key_value"
+          print_info "    → $skill_env_file"
+        done
       fi
     fi
   done
@@ -318,7 +430,7 @@ if "api_keys" not in data:
     data["api_keys"] = {}
 
 # 从环境变量读取并更新
-for key_name in ["TAVILY_API_KEY", "SILICONFLOW_API_KEY"]:
+for key_name in ["TAVILY_API_KEY", "SILICONFLOW_API_KEY", "WECHAT_APPID", "WECHAT_SECRET"]:
     value = os.environ.get(key_name)
     if value:
         data["api_keys"][key_name] = value
@@ -333,7 +445,8 @@ PYEOF
     echo ""
     echo "  可通过以下方式配置 API Keys:"
     echo ""
-    echo "    TAVILY_API_KEY=xxx SILICONFLOW_API_KEY=xxx ./install.sh"
+    echo "    TAVILY_API_KEY=xxx SILICONFLOW_API_KEY=xxx \\"
+    echo "    WECHAT_APPID=xxx WECHAT_SECRET=xxx ./install.sh"
     echo ""
     echo "  或在安装后编辑对应的 .env 文件"
   fi

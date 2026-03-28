@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(md2wechat:*)",
+      "Bash(cat:*)",
+      "Bash(bash:*)",
+      "Bash(go version:*)",
+      "Bash(test:*)",
+      "Bash(python:*)",
+      "Bash(curl:*)",
+      "Bash(git clone:*)",
+      "WebSearch",
+      "Bash(tar:*)",
+      "Bash(echo:*)",
+      "Bash(else:*)",
+      "Bash(fi)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

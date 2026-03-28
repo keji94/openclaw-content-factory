@@ -18,3 +18,8 @@ Thumbs.db
 # Backup
 *.backup
 *.bak
+
+# Env
+.env
+config/skills/*/.env
+claude.sh
