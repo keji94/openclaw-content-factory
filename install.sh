@@ -371,6 +371,7 @@ configure_api_keys() {
   local API_KEY_CONFIGS=(
     "TAVILY_API_KEY:Tavily 搜索:global"
     "SILICONFLOW_API_KEY:硅基流动 API:skill:yzfly-douyin-mcp-server-douyin-video,ai-cover-generator"
+    "GEMINI_API_KEY:Gemini API:skill:ai-cover-generator"
     "WECHAT_APPID:微信公众号 AppID:skill:md2wechat"
     "WECHAT_SECRET:微信公众号 Secret:skill:md2wechat"
   )
@@ -430,7 +431,7 @@ if "api_keys" not in data:
     data["api_keys"] = {}
 
 # 从环境变量读取并更新
-for key_name in ["TAVILY_API_KEY", "SILICONFLOW_API_KEY", "WECHAT_APPID", "WECHAT_SECRET"]:
+for key_name in ["TAVILY_API_KEY", "SILICONFLOW_API_KEY", "GEMINI_API_KEY", "WECHAT_APPID", "WECHAT_SECRET"]:
     value = os.environ.get(key_name)
     if value:
         data["api_keys"][key_name] = value
@@ -445,7 +446,7 @@ PYEOF
     echo ""
     echo "  可通过以下方式配置 API Keys:"
     echo ""
-    echo "    TAVILY_API_KEY=xxx SILICONFLOW_API_KEY=xxx \\"
+    echo "    TAVILY_API_KEY=xxx SILICONFLOW_API_KEY=xxx GEMINI_API_KEY=xxx \\"
     echo "    WECHAT_APPID=xxx WECHAT_SECRET=xxx ./install.sh"
     echo ""
     echo "  或在安装后编辑对应的 .env 文件"

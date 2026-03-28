@@ -38,8 +38,7 @@
 │  ────────────────────────                                       │
 │  - 检查是否有封面图片                                            │
 │  - 若无封面图，调用 AI 生成：                                    │
-│    python generate_cover.py --title "文章标题" --output cover.jpg│
-│  - 使用硅基流动 nanobanana 模型                                  │
+│    python generate_cover.py --title "文章标题" --output cover.jpg│                                 │
 │  - 根据标题关键词自动匹配风格                                    │
 │                                                                 │
 │           ↓                                                     │
