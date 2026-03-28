@@ -27,8 +27,8 @@
 │                                                                 │
 │  Step 3: 生成公众号 HTML                                        │
 │  ────────────────────────                                       │
-│  md2wechat convert article.md --mode ai --theme autumn-warm     │
-│  - 获取 prompt                                                  │
+│  md2wechat convert article.md --json                             │
+│  - 默认 AI 模式（环境变量 CONVERT_MODE=ai）                      │
 │  - 使用 prompt 生成微信公众号格式 HTML                           │
 │  - 提取图片列表                                                 │
 │                                                                 │
@@ -92,8 +92,8 @@
 ## 关键命令速查
 
 ```bash
-# 1. Markdown 转 HTML（获取 prompt）
-md2wechat convert article.md --mode ai --theme autumn-warm --json
+# 1. Markdown 转 HTML（获取 prompt，默认 AI 模式）
+md2wechat convert article.md --json
 
 # 2. 🎨 AI 生成封面图
 cd ~/.openclaw/workspace-content/skills/ai-cover-generator

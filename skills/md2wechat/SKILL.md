@@ -109,11 +109,13 @@ wechat:
 EOF
 ```
 
-### 或使用环境变量
+### 环境变量（推荐）
 
 ```bash
 export WECHAT_APPID="your_appid"
 export WECHAT_SECRET="your_secret"
+export CONVERT_MODE="ai"        # 默认使用 AI 模式
+export DEFAULT_THEME="autumn-warm"  # 默认主题
 ```
 
 ---
@@ -123,8 +125,8 @@ export WECHAT_SECRET="your_secret"
 ### 1. 转换 Markdown 为 HTML
 
 ```bash
-# AI 模式转换（返回 prompt，需用 AI 生成 HTML）
-md2wechat convert article.md --mode ai --theme autumn-warm --json
+# AI 模式转换（默认，通过环境变量 CONVERT_MODE=ai 配置）
+md2wechat convert article.md --json
 
 # 输出示例：
 # {
@@ -139,9 +141,8 @@ md2wechat convert article.md --mode ai --theme autumn-warm --json
 ```
 
 **参数说明**：
-- `--mode ai`: AI 模式，返回 prompt 供 AI 生成
-- `--theme`: 主题名称（autumn-warm, spring-fresh, ocean-calm 等）
 - `--json`: JSON 格式输出
+- `--theme`: 主题名称（默认 autumn-warm，可通过 DEFAULT_THEME 环境变量配置）
 
 ---
 
@@ -203,7 +204,7 @@ AI 在帮助用户发布文章时，按以下流程操作：
 ### Step 1: 转换 Markdown
 
 ```bash
-md2wechat convert article.md --mode ai --theme autumn-warm --json
+md2wechat convert article.md --json
 ```
 
 解析返回的 JSON，获取 `prompt` 和 `images`。

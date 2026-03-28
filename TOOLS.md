@@ -30,9 +30,9 @@ cd ~/.openclaw/workspace-content/skills/playwright-scraper-skill && node scripts
 
 ## 发布到微信公众号
 
-**Markdown 转 HTML**:
+**Markdown 转 HTML** (默认 AI 模式，已通过环境变量配置):
 ```bash
-md2wechat convert article.md --mode ai --theme autumn-warm --json
+md2wechat convert article.md --json
 ```
 
 **🎨 AI 生成封面图**:
@@ -75,10 +75,10 @@ md2wechat themes --json
 
 ### 表格信息
 
-- **App Token**: `<配置后填充>`
-- **素材库 Table ID**: `<配置后填充>`
-- **内容写作 Table ID**: `<配置后填充>`
-- **表格链接**: <配置后填充>
+- **App Token**: `KWz5b78quaAY6VsZZ38cAydpnkd`
+- **素材库 Table ID**: `tblimNT1H4scMsAV`
+- **内容写作 Table ID**: `tbl71t9oJChswXry`
+- **表格链接**: https://ecneneulpw01.feishu.cn/base/KWz5b78quaAY6VsZZ38cAydpnkd
 
 ---
 
