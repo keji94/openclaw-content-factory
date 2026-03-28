@@ -76,17 +76,37 @@ install_workspace() {
 
   # 复制项目文件（排除 .git、.idea 等开发文件）
   print_info "复制项目文件到 $WORKSPACE_DIR ..."
-  rsync -a \
-    --exclude='.git' \
-    --exclude='.idea' \
-    --exclude='.vscode' \
-    --exclude='.claude' \
-    --exclude='node_modules' \
-    --exclude='.env' \
-    --exclude='.DS_Store' \
-    --exclude='Thumbs.db' \
-    --exclude='.env.example' \
-    "$SCRIPT_DIR/" "$WORKSPACE_DIR/"
+  EXCLUDE_DIRS=(.git .idea .vscode .claude node_modules .DS_Store Thumbs.db)
+  EXCLUDE_FILES=(.env .env.example)
+
+  if command -v rsync &> /dev/null; then
+    rsync -a \
+      --exclude='.git' \
+      --exclude='.idea' \
+      --exclude='.vscode' \
+      --exclude='.claude' \
+      --exclude='node_modules' \
+      --exclude='.env' \
+      --exclude='.DS_Store' \
+      --exclude='Thumbs.db' \
+      --exclude='.env.example' \
+      "$SCRIPT_DIR/" "$WORKSPACE_DIR/"
+  else
+    print_warning "  rsync 不可用，使用 cp 回退方案"
+    mkdir -p "$WORKSPACE_DIR"
+    # 使用 tar 排除不需要的文件
+    tar cf - \
+      --exclude='.git' \
+      --exclude='.idea' \
+      --exclude='.vscode' \
+      --exclude='.claude' \
+      --exclude='node_modules' \
+      --exclude='.env' \
+      --exclude='.DS_Store' \
+      --exclude='Thumbs.db' \
+      --exclude='.env.example' \
+      -C "$SCRIPT_DIR" . | tar xf - -C "$WORKSPACE_DIR"
+  fi
 
   # 确保 memory 目录存在
   mkdir -p "$WORKSPACE_DIR/memory"
