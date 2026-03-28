@@ -263,9 +263,35 @@ cleanup_backups() {
     fi
 }
 
+# ── 移除定时任务 ─────────────────────────────────────
+remove_cron_jobs() {
+    print_info "移除定时任务..."
+
+    if ! command -v openclaw &> /dev/null; then
+        print_warning "  openclaw 命令不可用，跳过"
+        return
+    fi
+
+    # 查找并移除 content agent 相关的定时任务
+    local jobs
+    jobs=$(openclaw cron list 2>/dev/null)
+
+    if echo "$jobs" | grep -q "写作规则提取"; then
+        local job_id
+        job_id=$(echo "$jobs" | grep "写作规则提取" | awk '{print $1}')
+        if [ -n "$job_id" ]; then
+            openclaw cron remove "$job_id" 2>/dev/null
+            print_success "  已移除定时任务: 写作规则提取"
+        fi
+    else
+        print_info "  无相关定时任务需要移除"
+    fi
+}
+
 # ── 执行卸载逻辑 ─────────────────────────────────────
 case $UNINSTALL_MODE in
     "full")
+        remove_cron_jobs
         unregister_agent
         remove_agent_dir
         remove_external_tools

@@ -414,6 +414,42 @@ PYEOF
 
 configure_api_keys
 
+# ── Step 6: 配置定时任务 ─────────────────────────────────────
+setup_cron_jobs() {
+  print_info "配置定时任务..."
+
+  if ! command -v openclaw &> /dev/null; then
+    print_warning "  openclaw 命令不可用，跳过定时任务配置"
+    print_info "  安装后手动运行以下命令配置："
+    echo ""
+    echo "    openclaw cron add --name '写作规则提取' \\"
+    echo "      --cron '0 8 * * 1' \\"
+    echo "      --session isolated \\"
+    echo "      --message '检查 writing-improvement/finals/ 中是否有未分析的定稿，运行 python scripts/analyze_diff.py --all 提取规则，然后运行 python scripts/review_rules_simple.py --stats 查看统计。将结果整理成简洁报告，通过飞书消息通知用户。' \\"
+    echo "      --announce --channel feishu \\"
+    echo "      --agent $AGENT_ID"
+    echo ""
+    return
+  fi
+
+  # 每周一 08:00 自动提取写作规则并飞书通知
+  openclaw cron add \
+    --name "写作规则提取" \
+    --cron "0 8 * * 1" \
+    --session isolated \
+    --message "检查 writing-improvement/finals/ 中是否有未分析的定稿，运行 python scripts/analyze_diff.py --all 提取规则，然后运行 python scripts/review_rules_simple.py --stats 查看统计。将结果整理成简洁报告，通过飞书消息通知用户。" \
+    --announce \
+    --channel feishu \
+    --agent "$AGENT_ID" 2>/dev/null
+
+  if [ $? -eq 0 ]; then
+    print_success "  定时任务已创建: 每周一 08:00 自动提取写作规则并飞书通知"
+  else
+    print_warning "  定时任务创建失败，请手动配置"
+  fi
+}
+setup_cron_jobs
+
 echo ""
 print_success "安装完成!"
 echo ""

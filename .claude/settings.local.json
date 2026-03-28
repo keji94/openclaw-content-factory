@@ -13,7 +13,8 @@
       "Bash(tar:*)",
       "Bash(echo:*)",
       "Bash(else:*)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "mcp__web-reader__webReader"
     ],
     "deny": [],
     "ask": []
