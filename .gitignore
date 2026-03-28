@@ -23,3 +23,6 @@ Thumbs.db
 .env
 config/skills/*/.env
 claude.sh
+
+# Dependencies
+**/node_modules/

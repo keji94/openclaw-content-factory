@@ -212,6 +212,18 @@ remove_agent_dir() {
     fi
 }
 
+# ── 删除外部 CLI 工具 ─────────────────────────────────────
+remove_external_tools() {
+    print_info "检查外部 CLI 工具..."
+
+    if [ -x "$HOME/bin/md2wechat" ]; then
+        rm -f "$HOME/bin/md2wechat"
+        print_success "已删除: ~/bin/md2wechat"
+    else
+        print_info "  ~/bin/md2wechat 不存在，跳过"
+    fi
+}
+
 # ── 删除 Git 仓库目录 ─────────────────────────────────────
 remove_repo() {
     print_info "删除 Git 仓库目录..."
@@ -277,6 +289,7 @@ case $UNINSTALL_MODE in
     "full")
         unregister_agent
         remove_agent_dir
+        remove_external_tools
         remove_workspace
         remove_repo
         cleanup_backups

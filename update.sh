@@ -207,6 +207,50 @@ esac
 print_info "设置文件权限..."
 chmod 644 "$WORKSPACE_DIR"/*.md 2>/dev/null || true
 
+# ── 更新 Skills ─────────────────────────────────
+update_skills() {
+  print_info "同步 Skills..."
+
+  local SKILLS_SRC="$SCRIPT_DIR/config/skills"
+  local SKILLS_DEST="$WORKSPACE_DIR/skills"
+
+  if [ ! -d "$SKILLS_SRC" ]; then
+    print_warning "未找到源 Skills 目录: $SKILLS_SRC"
+    return
+  fi
+
+  mkdir -p "$SKILLS_DEST"
+
+  local updated=0
+  local added=0
+
+  for skill_dir in "$SKILLS_SRC"/*; do
+    if [ -d "$skill_dir" ]; then
+      skill_name=$(basename "$skill_dir")
+      if [ -d "$SKILLS_DEST/$skill_name" ]; then
+        # 已存在：同步更新（保留目标目录的 .env 等本地配置）
+        rsync -a --exclude='.env' --exclude='node_modules' --exclude='__pycache__' "$skill_dir/" "$SKILLS_DEST/$skill_name/" 2>/dev/null || \
+          cp -r "$skill_dir"/* "$SKILLS_DEST/$skill_name/" 2>/dev/null || true
+        print_info "  更新: $skill_name"
+        updated=$((updated + 1))
+      else
+        # 新增：完整复制
+        cp -r "$skill_dir" "$SKILLS_DEST/"
+        print_info "  新增: $skill_name"
+        added=$((added + 1))
+      fi
+    fi
+  done
+
+  if [ $updated -gt 0 ] || [ $added -gt 0 ]; then
+    print_success "Skills 同步完成 (更新: $updated, 新增: $added)"
+  else
+    print_info "Skills 目录为空，跳过"
+  fi
+}
+
+update_skills
+
 # 确保 memory 目录存在
 if [ ! -d "$WORKSPACE_DIR/memory" ]; then
     print_info "创建 memory 目录..."
